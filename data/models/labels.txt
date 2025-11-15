@@ -1,0 +1,4 @@
+0 corrosion
+1 crack
+2 fading
+3 normal

@@ -1,0 +1,81 @@
+# === Python / FastAPI ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Виртуальные окружения
+venv/
+.venv/
+env/
+ENV/
+
+# Логи
+*.log
+
+# === Секреты и конфиги ===
+.env
+.env.*
+*.secret
+*.key
+
+# === macOS / ОС ===
+.DS_Store
+.DS_Store?
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# === VS Code / IDE ===
+.vscode/
+.idea/
+*.iml
+
+# === Node / Vite / React frontend ===
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+turbo.log
+
+# Локальные env-файлы фронтенда (если появятся)
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# === Временные и резервные файлы ===
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.orig
+
+# === Данные проекта (по желанию) ===
+# Если не хочешь коммитить все сырые картинки — оставим только один пример
+
+# Все изображения, кроме тестового
+data/images/*
+!data/images/test_artifact.jpg
+
+# Модели:
+# если модель Teachable Machine важна для репо — НЕ игнорируем tm_savedmodel и labels.txt
+# и игнорируем тяжёлые альтернативные файлы, если они появятся
+# data/models/keras_model.h5 можно исключить, если это просто копия
+data/models/keras_model.h5

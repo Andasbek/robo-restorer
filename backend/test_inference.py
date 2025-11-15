@@ -1,0 +1,10 @@
+# backend/test_inference.py
+
+from pathlib import Path
+from backend.ai.inference import analyze_image
+
+if __name__ == "__main__":
+    img_path = Path("data/images/test_artifact.jpg")  # положи сюда любое тестовое фото
+    print("Проверяю модель на:", img_path)
+    result = analyze_image(str(img_path))
+    print(result)

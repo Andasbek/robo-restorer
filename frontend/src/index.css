@@ -1,0 +1,374 @@
+/* src/index.css */
+
+:root {
+  --bg: #020617;
+  --bg-soft: #020617;
+  --card: #020617;
+  --card-elevated: #020617;
+  --border-subtle: rgba(148, 163, 184, 0.25);
+  --accent: #22c55e;
+  --accent-soft: rgba(34, 197, 94, 0.15);
+  --accent-strong: #22c55e;
+  --danger: #ef4444;
+  --warning: #eab308;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --muted-soft: rgba(148, 163, 184, 0.15);
+  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.7);
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --blur: 18px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #0f172a 0, #020617 50%, #000 100%);
+  color: var(--text);
+}
+
+/* ===== Layout ===== */
+
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== Header ===== */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.app-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-title-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 10px;
+  background: radial-gradient(circle at 30% 0, #f97316 0, #ef4444 50%, #7c2d12 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px rgba(248, 113, 113, 0.6);
+  font-size: 14px;
+}
+
+.app-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.app-badge {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: var(--muted);
+  background: radial-gradient(circle at top, rgba(148, 163, 184, 0.25), transparent);
+}
+
+/* ===== Main grid ===== */
+
+.app-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1.4fr);
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .app-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ===== Cards ===== */
+
+.card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(var(--blur));
+  padding: 18px 18px 20px;
+}
+
+.card-header {
+  margin-bottom: 10px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.card-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.card-section {
+  margin-top: 10px;
+}
+
+/* ===== Form styles ===== */
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.form-label span {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+
+.form-input::file-selector-button {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  margin-right: 8px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+}
+
+.form-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  margin-top: 6px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(to right, #22c55e, #16a34a);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.45);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+    opacity 0.1s ease-out, filter 0.1s ease-out;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+.btn-primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 35px rgba(22, 163, 74, 0.65);
+}
+
+.btn-primary:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
+}
+
+/* ===== Status / badges ===== */
+
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: var(--muted);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+}
+
+.badge-dot--ok {
+  background: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+}
+
+.badge-dot--warning {
+  background: #eab308;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.9);
+}
+
+.badge-dot--danger {
+  background: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.9);
+}
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.risk-badge--LOW {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+}
+
+.risk-badge--MEDIUM {
+  background: rgba(234, 179, 8, 0.14);
+  color: #facc15;
+}
+
+.risk-badge--HIGH {
+  background: rgba(248, 113, 113, 0.16);
+  color: #fb7185;
+}
+
+/* ===== Result sections ===== */
+
+.result-section {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.result-section h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.result-list {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.result-list li {
+  margin-bottom: 2px;
+}
+
+.result-inline {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.result-ai {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-line;
+}
+
+/* Placeholder, когда ещё нет результата */
+
+.placeholder {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  font-size: 13px;
+  color: var(--muted);
+}
