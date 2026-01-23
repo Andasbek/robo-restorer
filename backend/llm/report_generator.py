@@ -50,7 +50,7 @@ def generate_ai_report(
     """)
 
     response = client.responses.create(
-        model="gpt-4.1-mini",  # или gpt-4o-mini / что у тебя есть
+        model="gpt-4o",  # или gpt-4o-mini / что у тебя есть
         input=prompt,
     )
 
