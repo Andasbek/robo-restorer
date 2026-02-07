@@ -1,5 +1,5 @@
 // src/App.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 type Sensors = {
   temperature: number;
@@ -38,20 +38,21 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyzeResult | null>(null);
 
+  // Theme state
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!file) return;
+
     setError(null);
-
-    if (!file) {
-      setError("Пожалуйста, выберите файл изображения.");
-      return;
-    }
-
     const formData = new FormData();
     formData.append("file", file);
-    if (useEmulator) {
-      formData.append("use_emulator", "on");
-    }
+    if (useEmulator) formData.append("use_emulator", "on");
     formData.append("lang", lang);
 
     try {
@@ -63,216 +64,243 @@ const App: React.FC = () => {
 
       if (!resp.ok) {
         const text = await resp.text();
-        throw new Error(`Ошибка сервера: ${resp.status} ${text}`);
+        throw new Error(`Server Error: ${resp.status} ${text}`);
       }
 
       const data = (await resp.json()) as AnalyzeResult;
       setResult(data);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Ошибка при обращении к API");
+      setError(err.message || "Failed to connect to API");
       setResult(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const riskBadgeClass = result ? `risk-badge risk-badge--${result.decision.risk_level}` : "risk-badge";
-
-  const envDotClass = (status: string) => {
-    if (status === "DANGER") return "badge-dot badge-dot--danger";
-    if (status === "WARNING") return "badge-dot badge-dot--warning";
-    return "badge-dot badge-dot--ok";
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    }
   };
 
   return (
-    <div className="app-root">
-      <main className="app-shell">
-        {/* HEADER */}
-        <header className="app-header">
-          <div className="app-brand">
-            <div className="app-title-row">
-              <div className="app-title-icon">🧪</div>
-              <h1 className="app-title">AI Conservator</h1>
-            </div>
-            <p className="app-subtitle">
-              Автоматический ассистент реставратора: датчики + компьютерное
-              зрение + OpenAI-отчёт для артефактов.
-            </p>
+    <div className="app-container">
+      {/* HEADER */}
+      <header className="app-header">
+        <div className="logo-block">
+          <div className="logo-symbol">⚒️</div>
+          <div className="logo-text">
+            <h3>Robo-Restorer</h3>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>v2.0.4 LAB</span>
           </div>
-          <div className="app-badge">Robo-Restorer Lab</div>
-        </header>
+        </div>
 
-        {/* GRID */}
-        <section className="app-grid">
-          {/* LEFT: FORM */}
-          <section className="card">
-            <div className="card-header">
-              <h2 className="card-title">Анализ артефакта</h2>
-              <p className="card-subtitle">
-                Загрузите фото и выберите режим датчиков. Система оценит
-                поверхность и предложит шаги по сохранению.
-              </p>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <div className="status-indicator">
+            <div className="status-dot"></div>
+            SYSTEM ONLINE
+          </div>
+
+          <button
+            className="theme-switch-btn"
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            title="Toggle Theme"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+        </div>
+      </header>
+
+      <main className="grid-layout">
+        {/* LEFT CONTROL PANEL */}
+        <section className="glass-panel">
+          <div className="panel-header">
+            <div className="panel-title">
+              <span>⚙️</span> CONFIGURATION
             </div>
+          </div>
 
+          <div className="panel-content">
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">
-                  Файл изображения
-                  <span>(фото фрагмента артефакта)</span>
-                </label>
-                <input
-                  className="form-input"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                />
+              {/* File Upload */}
+              <div className="control-group">
+                <label className="label-text">Target Artifact</label>
+                <div
+                  className={`drop-zone ${file ? 'active' : ''}`}
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                >
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+                    {file ? '📄' : '📤'}
+                  </div>
+                  <div style={{ color: 'var(--text-primary)' }}>
+                    {file ? file.name : "Click to Upload Image"}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                    Supported: JPG, PNG, WEBP
+                  </div>
+                </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">
-                  Режим датчиков
-                  <span>для презентации удобно оставить эмулятор</span>
-                </label>
-                <div className="form-checkbox-row">
+              {/* Emulator Toggle */}
+              <div className="control-group">
+                <label className="label-text">Data Source</label>
+                <label className="toggle-switch">
                   <input
-                    id="emulator"
                     type="checkbox"
                     checked={useEmulator}
                     onChange={(e) => setUseEmulator(e.target.checked)}
+                    style={{ display: 'none' }}
                   />
-                  <label htmlFor="emulator">
-                    Использовать эмулятор (без реального Arduino)
-                  </label>
-                </div>
+                  <div className="toggle-track">
+                    <div className="toggle-knob"></div>
+                  </div>
+                  <span style={{ color: 'var(--text-primary)' }}>
+                    {useEmulator ? "Emulator Mode" : "Hardware Sensors"}
+                  </span>
+                </label>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">
-                  Язык AI-отчёта
-                  <span>резюме от OpenAI</span>
-                </label>
+              {/* Language */}
+              <div className="control-group">
+                <label className="label-text">Report Language</label>
                 <select
-                  className="form-select"
+                  className="input-field"
                   value={lang}
                   onChange={(e) => setLang(e.target.value as "ru" | "en")}
                 >
-                  <option value="ru">Русский</option>
-                  <option value="en">English</option>
+                  <option value="ru">Russian (RU)</option>
+                  <option value="en">English (EN)</option>
                 </select>
               </div>
 
-              {error && (
-                <div className="placeholder" style={{ borderStyle: "solid", borderColor: "rgba(248,113,113,0.5)" }}>
-                  {error}
-                </div>
-              )}
-
+              {/* Submit */}
               <button
                 type="submit"
-                className="btn-primary"
-                disabled={loading || !file}
+                className="btn-cyber"
+                disabled={loading}
               >
-                {loading ? "Анализируем…" : "Запустить анализ"}
+                {loading ? "INITIALIZING SCAN..." : "RUN DIAGNOSTICS"}
               </button>
+
+              {error && (
+                <div style={{ marginTop: '1rem', color: 'var(--danger)', fontSize: '0.9rem' }}>
+                  ⚠️ {error}
+                </div>
+              )}
             </form>
-          </section>
+          </div>
+        </section>
 
-          {/* RIGHT: RESULTS */}
-          <section className="card">
-            <div className="card-header">
-              <h2 className="card-title">Результат анализа</h2>
-              <p className="card-subtitle">
-                Здесь появляются показания датчиков, вывод модели и текст
-                отчёта, который можно показать жюри/экспертам.
-              </p>
+        {/* RIGHT RESULTS PANEL */}
+        <section className="glass-panel" style={{ minHeight: '600px' }}>
+          <div className="panel-header">
+            <div className="panel-title">
+              <span>📊</span> DIAGNOSTIC RESULTS
             </div>
-
-            {!result && (
-              <div className="placeholder">
-                Загрузите изображение и нажмите{" "}
-                <strong>«Запустить анализ»</strong>. После этого здесь появится
-                полный отчёт: условия среды, тип повреждения и рекомендации.
+            {result && (
+              <div className={`risk-indicator risk-${result.decision.risk_level}`}>
+                RISK: {result.decision.risk_level}
               </div>
             )}
+          </div>
 
-            {result && (
-              <>
-                {/* Блок датчиков */}
-                <div className="result-section">
-                  <h3>Показания датчиков</h3>
-                  <p className="result-inline">
-                    <span className="badge-chip">
-                      <span
-                        className={envDotClass(
-                          result.sensors.environment_status
-                        )}
-                      />
-                      Среда: {result.sensors.environment_status}
-                    </span>{" "}
-                    &nbsp; Источник:{" "}
-                    <strong>
-                      {result.sensors.source === "emulator"
-                        ? "Эмулятор"
-                        : "Arduino"}
-                    </strong>
-                  </p>
-                  <ul className="result-list">
-                    <li>
-                      Температура: {result.sensors.temperature.toFixed(1)} °C
-                    </li>
-                    <li>
-                      Влажность: {result.sensors.humidity.toFixed(1)} %
-                    </li>
-                    <li>Свет: {result.sensors.light.toFixed(0)}</li>
-                  </ul>
+          <div className="panel-content">
+            {loading ? (
+              <div style={{
+                height: '400px',
+                display: 'flex',
+                justifyComponent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                gap: '1rem',
+                color: 'var(--text-secondary)'
+              }}>
+                <div className="status-dot" style={{ width: '12px', height: '12px' }}></div>
+                <div style={{ fontFamily: 'var(--font-mono)' }}>PROCESSING ARTIFACT DATA...</div>
+              </div>
+            ) : !result ? (
+              <div style={{
+                height: '400px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'var(--text-dim)',
+                border: '2px dashed var(--glass-border)',
+                borderRadius: 'var(--radius-md)'
+              }}>
+                Awaiting Input...
+              </div>
+            ) : (
+              <div className="hud-grid">
+
+                {/* Environmental Data */}
+                <div>
+                  <label className="label-text">ENVIRONMENTAL SENSORS</label>
+                  <div className="sensor-hud">
+                    <div className="sensor-box">
+                      <span className="sensor-value">{result.sensors.temperature}°C</span>
+                      <span className="sensor-label">TEMP</span>
+                    </div>
+                    <div className="sensor-box">
+                      <span className="sensor-value">{result.sensors.humidity}%</span>
+                      <span className="sensor-label">HUMIDITY</span>
+                    </div>
+                    <div className="sensor-box">
+                      <span className="sensor-value">{result.sensors.light}</span>
+                      <span className="sensor-label">LUMENS</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Компьютерное зрение */}
-                <div className="result-section">
-                  <h3>Поверхность артефакта (модель Teachable Machine)</h3>
-                  <p className="result-inline">
-                    Класс (raw): <code>{result.vision.image_class_raw}</code>
-                    <br />
-                    Класс (RU): <strong>{result.vision.image_class}</strong>
-                    <br />
-                    Уверенность:{" "}
-                    <strong>
-                      {(result.vision.confidence * 100).toFixed(1)}%
-                    </strong>
-                  </p>
-                  <ul className="result-list">
-                    {Object.entries(result.vision.probabilities).map(
-                      ([cls, prob]) => (
-                        <li key={cls}>
-                          {cls}: {(prob * 100).toFixed(1)}%
-                        </li>
-                      )
-                    )}
-                  </ul>
+                {/* Vision Analysis */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                  <div>
+                    <label className="label-text">VISUAL CLASSIFICATION</label>
+                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary)' }}>
+                      {result.vision.image_class.toUpperCase()}
+                    </div>
+
+                    <div style={{ marginTop: '1rem' }}>
+                      <div className="bar-info">
+                        <span>Confidence</span>
+                        <span>{(result.vision.confidence * 100).toFixed(1)}%</span>
+                      </div>
+                      <div className="confidence-bar">
+                        <div
+                          className="confidence-fill"
+                          style={{ width: `${result.vision.confidence * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="label-text">AI RECOMMENDATION</label>
+                    <div className={`verdict-panel risk-${result.decision.risk_level}`}>
+                      <b>Action:</b> {result.decision.recommendation}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Решение по правилам */}
-                <div className="result-section">
-                  <h3>Итоговое заключение (правила)</h3>
-                  <p className="result-inline">
-                    <span className={riskBadgeClass}>
-                      Риск: {result.decision.risk_level}
-                    </span>
-                  </p>
-                  <p className="result-inline" style={{ marginTop: 6 }}>
-                    {result.decision.recommendation}
-                  </p>
+                {/* AI Report */}
+                <div>
+                  <label className="label-text">DETAILED ANALYSIS REPORT</label>
+                  <div className="ai-typewriter">
+                    {result.ai_report}
+                  </div>
                 </div>
 
-                {/* AI-отчёт OpenAI */}
-                <div className="result-section">
-                  <h3>AI-отчёт (OpenAI)</h3>
-                  <p className="result-ai">{result.ai_report}</p>
-                </div>
-              </>
+              </div>
             )}
-          </section>
+          </div>
         </section>
       </main>
     </div>

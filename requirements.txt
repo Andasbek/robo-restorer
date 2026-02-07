@@ -4,10 +4,8 @@ pyserial
 pillow
 fastapi
 uvicorn
-python-multipart   # для загрузки файлов через форму
-# Если будешь делать веб-интерфейс:
-# fastapi
-# uvicorn
-
-# TensorFlow для Mac M1/M2 ставится обычно отдельно:
-# pip install tensorflow-macos tensorflow-metal
+python-multipart
+# Add missing dependencies for Mac execution
+openai
+tensorflow-macos
+tensorflow-metal
