@@ -85,12 +85,29 @@ npm install
 
 Для полноценной работы нужно запустить оба сервера (backend и frontend) одновременно.
 
-### 4.1. Запуск Backend API
+### 4.1. Автоматический запуск (рекомендуется)
 
-Откройте терминал в корне проекта:
+В корне проекта выполните:
 
 ```bash
-# Убедитесь, что venv активен
+./run.sh
+```
+
+Скрипт автоматически:
+1. Активирует виртуальное окружение `venv`
+2. Запустит backend на `http://localhost:8000`
+3. Запустит frontend на `http://localhost:5173`
+
+Оба сервера будут работать в фоновом режиме. Для остановки нажмите `Ctrl+C`.
+
+### 4.2. Ручной запуск (альтернатива)
+
+Если хотите запускать сервисы отдельно:
+
+**Терминал 1 - Backend API:**
+
+```bash
+# Убедитесь, что находитесь в корне проекта
 source venv/bin/activate
 
 # Запуск сервера Uvicorn
@@ -99,9 +116,7 @@ python -m backend.web_main
 
 API должен запуститься по адресу `http://localhost:8000`.
 
-### 4.2. Запуск Frontend UI
-
-Откройте **отдельное** окно терминала в `frontend/`:
+**Терминал 2 - Frontend UI:**
 
 ```bash
 cd frontend
@@ -110,12 +125,156 @@ npm run dev
 
 Веб-интерфейс будет доступен по адресу `http://localhost:5173`.
 
+### 4.3. Проверка запуска
+
+После успешного запуска:
+- Backend: откройте `http://localhost:8000` (должна быть страница API)
+- Frontend: откройте `http://localhost:5173` (должен загрузиться интерфейс Robo-Restorer)
+
 ---
 
-## 5. Устранение неполадок
+## 5. Использование интерфейса
 
--   **"ModuleNotFoundError: No module named 'openai'"**: Запустите `pip install openai`.
--   **"Failed to fetch" ошибка в UI**: Убедитесь, что бэкенд сервер работает на порту 8000.
--   **OpenAI API Error 401 (Unauthorized)**: Ваш API ключ неверный или не загружен.
-    1.  Проверьте `.env` на опечатки.
-    2.  **Перезапустите бэкенд сервер** (Ctrl+C, затем снова запустите), чтобы перезагрузить переменные окружения.
+После запуска откройте `http://localhost:5173`:
+
+1. **Загрузка изображения:**
+   - Нажмите на зону "Target Artifact"
+   - Выберите изображение артефакта (JPG, PNG, WEBP)
+
+2. **Настройка параметров:**
+   - **Data Source:** переключатель эмулятора (включен по умолчанию)
+   - **Report Language:** выбор языка отчета (RU/EN)
+
+3. **Запуск анализа:**
+   - Нажмите кнопку **"RUN DIAGNOSTICS"**
+   - Дождитесь завершения анализа
+
+4. **Просмотр результатов:**
+   - **Environmental Sensors:** показания датчиков (округлены до 2 знаков)
+   - **Visual Classification:** тип повреждения и уверенность модели
+   - **AI Recommendation:** рекомендации по уровню риска
+   - **Detailed Analysis Report:** развернутый AI-отчет
+
+---
+
+## 6. Устранение неполадок
+
+### Проблемы с зависимостями Python
+
+**"ModuleNotFoundError: No module named 'openai'"**
+```bash
+pip install openai
+```
+
+**Конфликт версий numpy и TensorFlow**
+```bash
+pip install 'numpy<2.0.0,>=1.23.5'
+pip install 'opencv-python<4.10'
+```
+
+### Проблемы с подключением
+
+**"Failed to fetch" ошибка в UI**
+1. Убедитесь, что backend работает на `http://localhost:8000`
+2. Проверьте консоль браузера на CORS ошибки
+3. Убедитесь, что в `backend/ui/web_app.py` настроен CORS для `http://localhost:5173`
+
+**Порт уже занят (Address already in use)**
+```bash
+# Найти процесс на порту 8000
+lsof -ti:8000
+
+# Остановить процесс
+kill -9 <PID>
+
+# Или для порта 5173 (frontend)
+lsof -ti:5173
+kill -9 <PID>
+```
+
+### Проблемы с OpenAI API
+
+**OpenAI API Error 401 (Unauthorized)**
+1. Проверьте файл `.env` на опечатки в ключе
+2. Убедитесь, что ключ начинается с `sk-proj-` или `sk-`
+3. Перезапустите backend сервер (Ctrl+C, затем снова запустите)
+4. Проверьте баланс на аккаунте OpenAI
+
+**OpenAI API Error 429 (Rate Limit)**
+- Превышен лимит запросов
+- Подождите некоторое время или обновите план
+
+### Проблемы с TensorFlow
+
+**"Failed to load model"**
+1. Проверьте наличие папки `data/models/tm_savedmodel/`
+2. Убедитесь, что файл `labels.txt` находится в `data/models/`
+3. Для macOS M1/M2 убедитесь, что установлены:
+   ```bash
+   pip install tensorflow-macos tensorflow-metal
+   ```
+
+**Ошибки при загрузке модели на macOS**
+- Используйте Python 3.11 (лучшая совместимость с TensorFlow на Apple Silicon)
+- Убедитесь, что установлена правильная версия TensorFlow (2.15-2.16)
+
+### Проблемы с frontend
+
+**Vite не запускается**
+```bash
+# Удалите node_modules и переустановите
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Изменения не отображаются**
+- Vite использует hot module replacement
+- Если изменения не видны, принудительно обновите страницу (Cmd+Shift+R / Ctrl+Shift+R)
+
+---
+
+## 7. CLI режим (опционально)
+
+Проект также поддерживает консольный режим:
+
+```bash
+source venv/bin/activate
+python -m backend.main --image data/images/test_artifact.jpg --emulator --lang ru
+```
+
+**Параметры:**
+- `--image PATH` — путь к изображению артефакта
+- `--emulator` — использовать эмулятор датчиков
+- `--lang ru|en` — язык отчета (по умолчанию: ru)
+
+---
+
+## 8. Подключение Arduino
+
+Для работы с реальными датчиками:
+
+1. **Подготовка Arduino:**
+   - Подключите датчик DHT22 для температуры/влажности
+   - Подключите LDR (фоторезистор) для измерения освещенности
+   - Загрузите скетч из папки `arduino/`
+
+2. **Настройка порта:**
+   Откройте `backend/sensors/serial_reader.py` и установите:
+   ```python
+   SERIAL_PORT = "/dev/cu.usbmodem14201"  # macOS
+   # или "/dev/ttyUSB0"  # Linux
+   # или "COM3"  # Windows
+   ```
+
+3. **Использование:**
+   - В web-интерфейсе отключите "Emulator Mode"
+   - В CLI не указывайте флаг `--emulator`
+
+---
+
+## 9. Дополнительные ресурсы
+
+- [Архитектура проекта](ARCHITECTURE.md)
+- [Справочник API](API.md)
+- [Сценарий демонстрации](DEMO_SCENARIO.md)
+- [Основной README](../README.md)

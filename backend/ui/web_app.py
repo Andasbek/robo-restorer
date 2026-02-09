@@ -20,12 +20,10 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="AI Conservator Web API")
 
 # Разрешаем запросы с фронтенда (Vite по умолчанию на 5173 порту)
+# Также разрешаем запросы из локальной сети для мобильного приложения
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origin_regex=r'^http://(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}):5173$',
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

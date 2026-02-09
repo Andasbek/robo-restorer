@@ -1,5 +1,6 @@
 // src/App.tsx
 import React, { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 type Sensors = {
   temperature: number;
@@ -217,7 +218,7 @@ const App: React.FC = () => {
               <div style={{
                 height: '400px',
                 display: 'flex',
-                justifyComponent: 'center',
+                justifyContent: 'center',
                 alignItems: 'center',
                 flexDirection: 'column',
                 gap: '1rem',
@@ -246,15 +247,15 @@ const App: React.FC = () => {
                   <label className="label-text">ENVIRONMENTAL SENSORS</label>
                   <div className="sensor-hud">
                     <div className="sensor-box">
-                      <span className="sensor-value">{result.sensors.temperature}°C</span>
+                      <span className="sensor-value">{result.sensors.temperature.toFixed(2)}°C</span>
                       <span className="sensor-label">TEMP</span>
                     </div>
                     <div className="sensor-box">
-                      <span className="sensor-value">{result.sensors.humidity}%</span>
+                      <span className="sensor-value">{result.sensors.humidity.toFixed(2)}%</span>
                       <span className="sensor-label">HUMIDITY</span>
                     </div>
                     <div className="sensor-box">
-                      <span className="sensor-value">{result.sensors.light}</span>
+                      <span className="sensor-value">{result.sensors.light.toFixed(2)}</span>
                       <span className="sensor-label">LUMENS</span>
                     </div>
                   </div>
@@ -294,7 +295,7 @@ const App: React.FC = () => {
                 <div>
                   <label className="label-text">DETAILED ANALYSIS REPORT</label>
                   <div className="ai-typewriter">
-                    {result.ai_report}
+                    <ReactMarkdown>{result.ai_report}</ReactMarkdown>
                   </div>
                 </div>
 

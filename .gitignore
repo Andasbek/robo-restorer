@@ -60,6 +60,23 @@ frontend/.env
 frontend/.env.local
 frontend/.env.*.local
 
+# === Mobile (React Native / Expo) ===
+mobile/node_modules/
+mobile/.expo/
+mobile/.expo-shared/
+mobile/dist/
+mobile/web-build/
+mobile/.env
+mobile/.env.local
+mobile/ios/
+mobile/android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
 # === Временные и резервные файлы ===
 *.tmp
 *.temp
@@ -80,3 +97,13 @@ data/images/*
 # и игнорируем тяжёлые альтернативные файлы, если они появятся
 # data/models/keras_model.h5 можно исключить, если это просто копия
 data/models/keras_model.h5
+
+# === Claude Code / AI Tools ===
+.claude/
+*.output
+
+# === Package manager lockfiles (опционально) ===
+# Раскомментируйте, если хотите игнорировать lockfiles
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
