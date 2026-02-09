@@ -29,7 +29,12 @@ type AnalyzeResult = {
   ai_report: string;
 };
 
-const API_URL = "http://localhost:8000/api/analyze";
+// Динамический API URL для работы в локальной сети
+const getApiUrl = () => {
+  const apiHost = import.meta.env.VITE_API_HOST || window.location.hostname;
+  return `http://${apiHost}:8000/api/analyze`;
+};
+const API_URL = getApiUrl();
 
 const App: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -48,7 +53,15 @@ const App: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+
+    // Отладка - вывод API URL
+    console.log("API URL:", API_URL);
+    console.log("File selected:", file ? file.name : "No file");
+
+    if (!file) {
+      setError("Пожалуйста, выберите изображение для анализа");
+      return;
+    }
 
     setError(null);
     const formData = new FormData();
@@ -58,10 +71,14 @@ const App: React.FC = () => {
 
     try {
       setLoading(true);
+      console.log("Sending request to:", API_URL);
+
       const resp = await fetch(API_URL, {
         method: "POST",
         body: formData,
       });
+
+      console.log("Response status:", resp.status);
 
       if (!resp.ok) {
         const text = await resp.text();
@@ -69,9 +86,10 @@ const App: React.FC = () => {
       }
 
       const data = (await resp.json()) as AnalyzeResult;
+      console.log("Analysis complete:", data);
       setResult(data);
     } catch (err: any) {
-      console.error(err);
+      console.error("Error:", err);
       setError(err.message || "Failed to connect to API");
       setResult(null);
     } finally {
